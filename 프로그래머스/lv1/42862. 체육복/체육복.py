@@ -7,6 +7,7 @@ def solution(n, lost, reserve):
     for i in reserve:
         clothes[i] += 1
     
+    print(clothes)
     
     for i in range(1, len(clothes)):
         if clothes[i] == 0 and clothes[i-1] == 2:
