@@ -69,14 +69,20 @@ Leo가 가진 음식의 스코빌 지수를 담은 배열 scoville과 원하는 
 
 ### JAVA 문법
 
-선언 : PriorityQueue<Integer> pq = new PriorityQueue<>(); [최소]
-      PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());  [최대]
-추가 : pq.add(3);
-       pq.offer(1);
-제거 : pq.poll(); [맨 앞값을 제거하면서 리턴]
+선언 : 
+        PriorityQueue<Integer> pq = new PriorityQueue<>(); [최소]
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());  [최대]
+      
+추가 : 
+        pq.add(3);
+        pq.offer(1);
+제거 : 
+        pq.poll(); [맨 앞값을 제거하면서 리턴]
         pq.remove(); [맨 앞값 제거]
         pq.clear(); [전체 삭제]
-확인 : pq.peek();
-크기 확인 : pq.size();
+확인 : 
+        pq.peek();
+크기 확인 : 
+        pq.size();
 
 
