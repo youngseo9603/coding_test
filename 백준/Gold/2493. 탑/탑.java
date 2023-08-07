@@ -32,12 +32,12 @@ public class Main {
 				}
 				stack.add(new int[] {i, tower[i]});
 			}
-			
-			
 		}
 		
+		StringBuilder sb = new StringBuilder();
 		for(int i=0; i<n; i++)
-			System.out.print(answer[i] + " ");
+			sb.append(answer[i]).append(" ");
+		System.out.println(sb);
 		
 		
 	}
