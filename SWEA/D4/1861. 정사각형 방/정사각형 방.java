@@ -38,7 +38,9 @@ public class Solution {
 					}
 						
 				}
-			System.out.println("#" + (testCase+1) + " " + index + " " + (answer+1));
+			StringBuilder s = new StringBuilder();
+			s.append("#").append(testCase+1).append(" ").append(index).append(" ").append(answer+1);
+			System.out.println(s);
 		}
 	}
 	
