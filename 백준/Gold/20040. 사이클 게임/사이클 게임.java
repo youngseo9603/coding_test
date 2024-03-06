@@ -18,15 +18,14 @@ public class Main {
             parent[i] = i;
 
         int answer = 0;
-        boolean find = false;
         for(int i=0; i<m; i++){
             st = new StringTokenizer(br.readLine());
             int x = Integer.parseInt(st.nextToken());
             int y = Integer.parseInt(st.nextToken());
 
-            if(!find && find(x) == find(y)){
+            if(find(x) == find(y)){
                 answer = i+1;
-                find = true;
+                break;
             }
             union(x, y);
         }
