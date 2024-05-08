@@ -24,7 +24,7 @@ public class Main {
         hm.put(c,1);
         for(int i=n-k; i<n; i++)
             hm.put(map[i], hm.getOrDefault(map[i], 0) + 1);
-        
+
         int answer = hm.keySet().size();
 
         for(int i=0; i<n; i++){
