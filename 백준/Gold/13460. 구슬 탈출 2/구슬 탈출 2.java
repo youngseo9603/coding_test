@@ -2,156 +2,211 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-	static int N, M;
-	static char[][] map;
-	static boolean[][][][] visited;
-	static int holeX, holeY;
-	static Marble blue, red;
-	
-	static int[] dx = {-1, 0, 1, 0};
-	static int[] dy = {0, 1, 0, -1}; //0, 1, 2, 3 (상, 우, 하, 좌) - 시계 방향 
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+    public static int[] dx = {0, 0, -1, 1}; // 우, 좌, 상, 하
+    public static int[] dy = {1, -1, 0, 0};
+    static int n;
+    static int m;
+    static int[][] map;
+    static int answer;
+    static boolean[][][][] visited;
 
-		N = Integer.parseInt(st.nextToken());		
-		M = Integer.parseInt(st.nextToken());		
-		
-		map = new char[N][M];
-		visited = new boolean[N][M][N][M];
+    public static class Marble {
+        int rx;
+        int ry;
+        int bx;
+        int by;
+        boolean done;
+        boolean fail;
+        int cnt;
 
-		// 구슬 map 구성 
-		for(int i = 0; i < N; i++) {
-			String str = br.readLine();
-			for(int j = 0; j < M; j++) {
-				map[i][j] = str.charAt(j);
-				
-				if(map[i][j] == 'O') {
-					holeX = i;
-					holeY = j;
-				} else if(map[i][j] == 'B') {
-					blue = new Marble(0, 0, i, j, 0);
-				} else if(map[i][j] == 'R') {
-					red = new Marble(i, j, 0, 0, 0);
-				}
-			}
-		}
+        public Marble(int rx, int ry, int bx, int by) {
+            this.rx = rx;
+            this.ry = ry;
+            this.bx = bx;
+            this.by = by;
+            done = false;
+            fail = false;
+            cnt = 0;
+        }
+    }
 
-		System.out.println(bfs());
-		
-		br.close();
-	}
-	
-	public static int bfs() {
-		Queue<Marble> queue = new LinkedList<>();
-		queue.add(new Marble(red.rx, red.ry, blue.bx, blue.by, 1));
-		visited[red.rx][red.ry][blue.rx][blue.ry] = true;
-		
-		while(!queue.isEmpty()) {
-			Marble marble = queue.poll();
-			
-			int curRx = marble.rx;
-			int curRy = marble.ry;
-			int curBx = marble.bx;
-			int curBy = marble.by;
-			int curCnt = marble.cnt;
-		
-			if(curCnt > 10) { // 이동 횟수가 10 초과시 실패 
-				return -1;
-			}
-			
-			for(int i = 0; i < 4; i++) {
-				int newRx = curRx;
-				int newRy = curRy;
-				int newBx = curBx;
-				int newBy = curBy;
-				
-				boolean isRedHole = false;
-				boolean isBlueHole = false;
-				
-				// 빨간 구슬 이동 -> # 벽을 만날 때까지 이동 
-				while(map[newRx + dx[i]][newRy + dy[i]] != '#') { 
-					newRx += dx[i];
-					newRy += dy[i];
-					
-					// 이동 중 구멍을 만날 경우 
-					if(newRx == holeX && newRy == holeY) { 
-						isRedHole = true;
-						break;
-					}
-				}
-				
-				// 파란 구슬 이동 -> # 벽을 만날 때까지 이동 
-				while(map[newBx + dx[i]][newBy + dy[i]] != '#') { 
-					newBx += dx[i];
-					newBy += dy[i];
-					
-					// 이동 중 구멍을 만날 경우 
-					if(newBx == holeX && newBy == holeY) { 
-						isBlueHole = true;
-						break;
-					}
-				}
-				
-				if(isBlueHole) { // 파란 구슬이 구멍에 빠지면 무조건 실패 
-					continue; // 하지만 큐에 남은 다른 좌표도 봐야하니 다음으로 
-				}
-				
-				if(isRedHole && !isBlueHole) { // 빨간 구슬만 구멍에 빠지면 성공 
-					return curCnt;
-				}
-				
-				// 둘 다 구멍에 빠지지 않았는데 이동할 위치가 같은 경우 -> 위치 조정
-				if(newRx == newBx && newRy == newBy) {
-					if(i == 0) { // 위쪽으로 기울이기 
-						// 더 큰 x값을 가지는 구슬이 뒤로 감 
-						if(curRx > curBx) newRx -= dx[i]; 
-						else newBx -= dx[i];
-					} else if(i == 1) { // 오른쪽으로 기울이기 
-						// 더 작은 y값을 가지는 구슬이 뒤로 감 
-						if(curRy < curBy) newRy -= dy[i];
-						else newBy -= dy[i];	
-					} else if(i == 2) { // 아래쪽으로 기울이기 
-						// 더 작은 x값을 가지는 구슬이 뒤로 감 
-						if(curRx < curBx) newRx -= dx[i]; 
-						else newBx -= dx[i];
-					} else { // 왼쪽으로 기울이기 
-						// 더 큰 y값을 가지는 구슬이 뒤로 감 
-						if(curRy > curBy) newRy -= dy[i]; 
-						else newBy -= dy[i];	
-					}
-				}
-				
-				// 두 구슬이 이동할 위치가 처음 방문하는 곳인 경우만 이동 -> 큐에 추가 
-				if(!visited[newRx][newRy][newBx][newBy]) {
-					visited[newRx][newRy][newBx][newBy] = true;
-					queue.add(new Marble(newRx, newRy, newBx, newBy, curCnt+1));
-				}
-			}
-		}
-		
-		return -1;
-	}
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-}
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
 
-class Marble {
-	int rx;
-	int ry;
-	int bx;
-	int by;
-	int cnt;
-	
-	Marble(int rx, int ry, int bx, int by, int cnt) {
-		this.rx = rx;
-		this.ry = ry;
-		this.bx = bx;
-		this.by = by;
-		this.cnt = cnt;
-	}
+        map = new int[n][m];
+        visited = new boolean[n][m][n][m];
+
+        int rx = 0, ry = 0, bx = 0, by = 0;
+        for (int i = 0; i < n; i++) {
+            String s = br.readLine();
+            for (int j = 0; j < m; j++) {
+                if(s.charAt(j) == '#') {
+                    map[i][j] = 1;
+                }
+                else if (s.charAt(j) == '.') {
+                    map[i][j] = 0;
+                }
+                else if (s.charAt(j) == 'O') {
+                    map[i][j] = 2;
+                }
+                else if (s.charAt(j) == 'R') {
+                    map[i][j] = 0;
+                    rx = i;
+                    ry = j;
+                }
+                else if (s.charAt(j) == 'B') {
+                    map[i][j] = 0;
+                    bx = i;
+                    by = j;
+                }
+            }
+        }
+
+        Marble marble = new Marble(rx, ry, bx, by);
+        answer = 0;
+        bfs(marble);
+
+    }
+
+    public static void bfs(Marble marble){
+
+        Queue<Marble> queue = new LinkedList<>();
+        queue.add(marble);
+        visited[marble.rx][marble.ry][marble.bx][marble.by] = true;
+        while(!queue.isEmpty()){
+            Marble m = queue.poll();
+            if(m.cnt > 10)
+                break;
+
+//            System.out.println(m.rx + " " + m.ry + " " + m.bx + " " + m.by + " " + m.fail + " " + m.done);
+
+            if(map[m.rx][m.ry] == 2 && !m.fail && m.done){
+                answer = m.cnt;
+                break;
+            }
+            else if(m.fail){
+                continue;
+            }
+
+            for(int d=0; d<4; d++){
+                Marble next = move(m, d);
+                if(!visited[next.rx][next.ry][next.bx][next.by] && !next.fail) {
+                    queue.add(next);
+                    visited[next.rx][next.ry][next.bx][next.by] = true;
+                }
+            }
+        }
+
+        if(answer == 0) System.out.println(-1);
+        else System.out.println(answer);
+
+    }
+
+    public static Marble move(Marble marble, int d){
+
+        int rx = marble.rx;
+        int ry = marble.ry;
+        int bx = marble.bx;
+        int by = marble.by;
+        Marble next = new Marble(rx, ry, bx, by);
+        next.cnt = marble.cnt + 1;
+        boolean redFirst = moveFirst(marble, d);
+
+        if(redFirst){ // r 부터
+            while(rx + dx[d] >= 0 && ry + dy[d] >= 0 && rx + dx[d] < n && ry + dy[d] < m && (map[rx + dx[d]][ry + dy[d]] == 0 || map[rx + dx[d]][ry + dy[d]] == 2)){
+                if(map[rx + dx[d]][ry + dy[d]] == 2){ // goal
+                    next.done = true;
+                    rx += dx[d];
+                    ry += dy[d];
+                    break;
+                }
+                rx += dx[d];
+                ry += dy[d];
+            }
+
+            while(bx + dx[d] >= 0 && by + dy[d] >= 0 && bx + dx[d] < n && by + dy[d] < m && (map[bx + dx[d]][by + dy[d]] == 0 || map[bx + dx[d]][by + dy[d]] == 2)){
+                if(map[bx + dx[d]][by + dy[d]] == 2){
+                    next.fail = true;
+                    bx += dx[d];
+                    by += dy[d];
+                    return next;
+                }
+                bx += dx[d];
+                by += dy[d];
+            }
+            if(rx == bx && ry == by) {
+                bx -= dx[d];
+                by -= dy[d];
+            }
+        }
+        else {
+            while(bx + dx[d] >= 0 && by + dy[d] >= 0 && bx + dx[d] < n && by + dy[d] < m && (map[bx + dx[d]][by + dy[d]] == 0 || map[bx + dx[d]][by + dy[d]] == 2)){
+                if(map[bx + dx[d]][by + dy[d]] == 2){
+                    next.fail = true;
+                    bx += dx[d];
+                    by += dy[d];
+                    return next;
+                }
+                bx += dx[d];
+                by += dy[d];
+            }
+            while(rx + dx[d] >= 0 && ry + dy[d] >= 0 && rx + dx[d] < n && ry + dy[d] < m && (map[rx + dx[d]][ry + dy[d]] == 0 || map[rx + dx[d]][ry + dy[d]] == 2)){
+                if(map[rx + dx[d]][ry + dy[d]] == 2){ // goal
+                    next.done = true;
+                    rx += dx[d];
+                    ry += dy[d];
+                    break;
+                }
+                rx += dx[d];
+                ry += dy[d];
+            }
+            if(rx == bx && ry == by) {
+                rx -= dx[d];
+                ry -= dy[d];
+            }
+        }
+
+        if(next.done && next.fail){
+            next.fail = false;
+        }
+
+        next.rx = rx;
+        next.ry = ry;
+        next.bx = bx;
+        next.by = by;
+
+        return next;
+    }
+
+    public static boolean moveFirst(Marble marble, int d){
+
+        if(d == 0){
+            if(marble.ry > marble.by)   return true; // r 부터
+            else return false; // b 부터
+        }
+        else if (d == 1){
+            if(marble.ry < marble.by)   return true;
+            else return false;
+        }
+        else if(d == 2){
+            if(marble.rx < marble.bx)   return true;
+            else return false;
+        }
+        else {
+            if(marble.rx > marble.bx)   return true;
+            else return false;
+        }
+
+    }
+
 }
