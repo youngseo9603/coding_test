@@ -1,0 +1,16 @@
+-- 코드를 입력하세요
+SELECT CATEGORY, PRICE AS 'MAX_PRICE', PRODUCT_NAME
+FROM FOOD_PRODUCT
+WHERE CATEGORY IN ('과자', '국', '김치', '식용유')
+AND (CATEGORY, PRICE) IN (
+        SELECT CATEGORY, MAX(PRICE)
+        FROM FOOD_PRODUCT
+        GROUP BY CATEGORY
+    )
+ORDER BY PRICE DESC
+
+#
+#김치	19000	맛있는배추김치
+#식용유	8950	맛있는마조유
+#국	2900	맛있는김치찌개
+#과자	1950	맛있는허니버터칩
