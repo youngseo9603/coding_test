@@ -4,37 +4,28 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+        int[] num = new int[n];
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < n; i++) {
+            num[i] = Integer.parseInt(st.nextToken());
+        }
 
-	public static void main(String[] args) throws NumberFormatException, IOException {
-		
-		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-		int n = Integer.parseInt(bf.readLine());
-		StringTokenizer st = new StringTokenizer(bf.readLine());
-		int[] num = new int[n];
-		
-		for(int i=0; i<n; i++)
-			num[i] = Integer.parseInt(st.nextToken());
-		
-		int[] dp = new int[n];
-		dp[0] = num[0];
-		
-		int max = num[0];
-		for(int i=1; i<n; i++) {
-			dp[i] = dp[i-1] + num[i];
-			if(dp[i] < 0) 
-				dp[i] = 0;
-			if(max < num[i])
-				max = num[i];
-		}
-		
-		int answer = 0;
-		for(int i=0; i<n; i++)
-			if(dp[i] > answer)
-				answer = dp[i];
-		
-		if(answer == 0)  System.out.println(max);
-		else	System.out.println(answer);
+        long[] dp = new long[n];
+        dp[0] = num[0];
+        long answer = dp[0];
+        for(int i=1; i<n; i++){
+            dp[i] = Math.max(dp[i-1] + num[i], num[i]);
+            answer = Math.max(answer, dp[i]);
+        }
 
-	}
-
+        System.out.println(answer);
+    }
 }
+/*
+0 10 6 9 10 15 21 -14 -2 19 18
+
+0 2 3 -1 2 6 2 8 13 8 9
+ */
